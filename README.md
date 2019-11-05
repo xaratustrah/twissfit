@@ -1,2 +1,2 @@
 # twissfit
-Fit and calculate TWISS parameters from a porfile grid monitor
+Fit data from a profile grid monitor and calculate TWISS parameters for the quadrupole behind it.
