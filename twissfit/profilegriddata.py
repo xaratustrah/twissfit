@@ -9,6 +9,7 @@ Xaratustrah
 
 """
 import os
+import uuid
 import numpy as np
 from scipy.optimize import curve_fit
 import sys
@@ -32,6 +33,34 @@ class ProfileGridData(object):
         yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=67)
         self.data = np.concatenate((xvals, yvals), axis=1)
         self.data = np.delete(self.data, 2, 1)
+
+    @staticmethod
+    def create_sim_data():
+        x = np.arange(-45, 46.5, 1.5)
+        amp = np.random.randint(800, 1800)
+        mu = np.random.randint(-20, 20)
+        sigma = np.random.randint(2, 10)
+        popt = [0, 0, amp, mu, sigma]
+        vals = ProfileGridData.fit_function(x, *popt)
+        plt.plot(x, vals, 'ro', label='Fit')
+        # np.vstack((x, vals)).T
+        return x, vals, amp, mu, sigma
+
+    @staticmethod
+    def write_sim_data():
+        filename = str(uuid.uuid1()) + '.csv'
+        xh, valsh, amph, muh, sigmah = ProfileGridData.create_sim_data()
+        xv, valsv, ampv, muv, sigmav = ProfileGridData.create_sim_data()
+        with open(filename, 'w') as file:
+            file.write('device:\nSIMULATION\ngain:\nSIMULATION\n')
+            file.write(
+                'x-values: (Amp {} Mu {} Sigma {})\n'.format(amph, muh, sigmah))
+            for i in range(len(xh)):
+                file.write('{}, {}\n'.format(xh[i], valsh[i]))
+            file.write(
+                'y-values: (Amp {} Mu {} Sigma {})\n'.format(ampv, muv, sigmav))
+            for i in range(len(xv)):
+                file.write('{}, {}\n'.format(xv[i], valsv[i]))
 
     @staticmethod
     def fit_function(x, *p):
