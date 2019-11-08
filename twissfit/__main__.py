@@ -40,9 +40,13 @@ def main():
 
     if args.process:
         files = args.process
+        if len(files) < 5:
+            print('Please provide at least 5 files.')
+            sys.exit()
+
         for file in files:
             grid_data = ProfileGridData(file)
-            grid_data.process_horiz_and_vert()
+            sigma_x, sigma_y = grid_data.process_horiz_and_vert()
         sys.exit()
 
     print('Nothing to do.')

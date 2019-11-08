@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Profile grid data and twiss parameter fitter
+Profile grid data interface
 Exporter, Fitter, plotter
 
 2019
@@ -17,7 +17,7 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 
 RANGE = 25
-SIGMA_ESTIMATE = 20
+SIGMA_ESTIMATE = 10
 
 
 class ProfileGridData(object):
@@ -73,12 +73,9 @@ class ProfileGridData(object):
     def fit_and_plot(x_data, y_data, name=""):
 
         # x and y are the variables for the fitter
-        # pos is the real position vector in mm
         x = x_data
-        #delta_pos = np.diff(pos)[0]
+        x_for_plotting = np.linspace(x_data.min(), x_data.max(), 400)
         y = y_data
-        #x = np.arange(len(y))
-        #x = pos
 
         # Estimate for mean and sigma
         mean_idx = y.argmax()
@@ -90,6 +87,8 @@ class ProfileGridData(object):
         p = [offset, slope, amp, mean, sigma]
         # defining the fitting region
         data_cut = (x > mean - RANGE) & (x < mean + RANGE)
+        x_for_plotting_data_cut = (
+            x_for_plotting > mean - RANGE) & (x_for_plotting < mean + RANGE)
 
         # fit
         popt, pcov = curve_fit(ProfileGridData.fit_function,
@@ -102,8 +101,8 @@ class ProfileGridData(object):
         fig = plt.figure()
         ax = fig.gca()
         ax.plot(x, y, 'kx', label='Data')
-        ax.plot(x[data_cut], ProfileGridData.fit_function(
-            x[data_cut], *popt), 'r', label='Fit')
+        ax.plot(x_for_plotting[x_for_plotting_data_cut], ProfileGridData.fit_function(
+            x_for_plotting[x_for_plotting_data_cut], *popt), 'r', label='Fit')
         ax.set_xlabel('mean = {:0.2e}, sigma = {:0.2e}, area = {:0.2e}'.format(
             mean, sigma, area))
         ax.set_title(name)
@@ -127,6 +126,9 @@ class ProfileGridData(object):
         popt, area = ProfileGridData.fit_and_plot(
             pos, hor_grid, name='{}_Horizontal'.format(self.filename_base))
         print(self.filename_base, ' | '.join(map(str, popt)), area)
+        sigma_x = popt[4]
         popt, area = ProfileGridData.fit_and_plot(
             pos, ver_grid, name='{}_Vertical'.format(self.filename_base))
         print(self.filename_base, ' | '.join(map(str, popt)), area)
+        sigma_y = popt[4]
+        return sigma_x, sigma_y
