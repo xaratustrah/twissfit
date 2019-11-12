@@ -118,17 +118,23 @@ class ProfileGridData(object):
         plt.savefig('{}.pdf'.format(name))
         return popt, area
 
-    def process_horiz_and_vert(self):
+    def process_horiz_and_vert(self, verbose=False):
         self._read_data()
         pos = self.data[:, 0]
         hor_grid = self.data[:, 1]
         ver_grid = self.data[:, 2]
         popt, area = ProfileGridData.fit_and_plot(
             pos, hor_grid, name='{}_Horizontal'.format(self.filename_base))
-        print(self.filename_base, ' | '.join(map(str, popt)), area)
+        if verbose:
+            print()
+            print('Name | Offset | Slope | Amplitude | Mean | Sigma')
+            print(self.filename_base, ' | '.join(map(str, popt)), area)
         sigma_x = popt[4]
         popt, area = ProfileGridData.fit_and_plot(
             pos, ver_grid, name='{}_Vertical'.format(self.filename_base))
-        print(self.filename_base, ' | '.join(map(str, popt)), area)
+        if verbose:
+            print()
+            print('Name | Offset | Slope | Amplitude | Mean | Sigma')
+            print(self.filename_base, ' | '.join(map(str, popt)), area)
         sigma_y = popt[4]
         return sigma_x, sigma_y

@@ -12,6 +12,8 @@ Xaratustrah
 import os
 import sys
 import argparse
+import numpy as np
+from twissfit.twiss import *
 from twissfit.version import __version__
 from twissfit.profilegriddata import ProfileGridData
 
@@ -40,16 +42,40 @@ def main():
 
     if args.process:
         files = args.process
-        if len(files) < 5:
-            print('Please provide at least 5 files.')
+        nfiles = len(files)
+        nfiles_min = 3
+        ntries = 4
+        if nfiles < nfiles_min:
+            print('Please provide at least {} files.'.format(nfiles_min))
             sys.exit()
-
+        result_matrix = np.array([], dtype=np.float64)
         for file in files:
-            grid_data = ProfileGridData(file)
-            sigma_x, sigma_y = grid_data.process_horiz_and_vert()
+            for i in reversed(range(ntries)):
+                try:
+                    k_prime_l_quad = float(
+                        input("Please enter the K'L for {}: ".format(file)))
+                    # print(k_prime_l_quad)
+                    grid_data = ProfileGridData(file)
+                    sigma_x, sigma_y = grid_data.process_horiz_and_vert(
+                        verbose=False)
+                    result_matrix = np.append(
+                        result_matrix, (k_prime_l_quad, sigma_x, sigma_y))
+                except (KeyboardInterrupt, EOFError) as e:
+                    print('\nNothing to do.')
+                    sys.exit()
+                except ValueError as e:
+                    if i == 0:
+                        print('Too many wrong entries.\nNothing to do.\n')
+                        sys.exit()
+                    print(
+                        '\nNot a valid number. Please try again. You have {} tries left.'.format(i))
+                    continue
+                break
+        result_matrix = result_matrix.reshape((nfiles, 3))
+        solve_equation_system(result_matrix)
         sys.exit()
 
-    print('Nothing to do.')
+    print('\nNothing to do.')
 
 
 if __name__ == "__main__":

@@ -7,6 +7,12 @@ TWISS parameter calculations
 Xaratustrah (S. Sanjari)
 based on method / calculations by: H. Weick
 
+Reference:
+
+H. Wollnik, Optics of Charged Particles, Academic Press, 1987, pages 52 and 154.
+In the above reference, B, A and C are beta, alpha and gamma Twiss / Courant-Snyder parameters.
+
+
 
 """
 
@@ -18,6 +24,10 @@ R_QUAD = 0.085  # m
 I1A_NORM = 0.00092
 BRHO = 8.151048  # Tm
 B = -0.23044572  # T
+
+
+def get_gamma(beta, alpha):
+    return (1 + alpha**2) / beta
 
 
 def calculate_k_prime_l_quad():
@@ -70,10 +80,6 @@ def get_twiss_matrix(xfer):
     return np.reshape(ss, (3, 3))
 
 
-def get_gamma(beta, alpha):
-    return (1 + alpha**2) / beta
-
-
 def transform(beta0, alpha0, xfer):
     inp = np.array([beta0, alpha0, get_gamma(beta0, alpha0)]).reshape(3, 1)
     mat = get_twiss_matrix(xfer) @ inp
@@ -81,6 +87,51 @@ def transform(beta0, alpha0, xfer):
     alpha1 = mat[1, 0]
     gamma1 = mat[2, 0]
     return beta1, alpha1, gamma1
+
+
+def solve_equation_system(result_matrix):
+    nrows, ncols = np.shape(result_matrix)
+
+    # solving a X = b for x-plane
+    a_hor = np.array([])
+    b_hor = np.array([])
+    a_vert = np.array([])
+    b_vert = np.array([])
+
+    for row in result_matrix:
+        k_prime_l_quad = row[0]
+        kappa_quad = get_kappa_quad(k_prime_l_quad)
+        ff = get_ff(k_prime_l_quad)
+        sigma_x = row[1]
+        xfer_hor = get_xfer_hor(ff, get_mq_hor(kappa_quad))
+        tw_hor = get_twiss_matrix(xfer_hor)
+        a_hor = np.append(a_hor, (tw_hor[0, 0], tw_hor[0, 1], tw_hor[0, 2]))
+        b_hor = np.append(b_hor, sigma_x ** 2)
+    a_hor = np.reshape(a_hor, (nrows, 3))
+    X_hor, res_hor, _, _ = np.linalg.lstsq(a_hor, b_hor, rcond=None)
+    print()
+    print('beta_x * eps_x', X[0])
+    print('alhpa_x * eps_x', X[1])
+    print('gamma_x * eps_x', X[2])
+
+    # solving a X = b for y-plane
+    for row in result_matrix:
+        k_prime_l_quad = row[0]
+        kappa_quad = get_kappa_quad(k_prime_l_quad)
+        ff = get_ff(k_prime_l_quad)
+        sigma_y = row[2]
+        xfer_vert = get_xfer_vert(ff, get_mq_vert(kappa_quad))
+        tw_vert = get_twiss_matrix(xfer_vert)
+        a_vert = np.append(
+            a_vert, (tw_vert[0, 0], tw_vert[0, 1], tw_vert[0, 2]))
+        b_vert = np.append(b_vert, sigma_y ** 2)
+    a_vert = np.reshape(a_vert, (nrows, 3))
+    X_vert, res_vert, _, _ = np.linalg.lstsq(a_vert, b_vert, rcond=None)
+    print()
+    print('beta_y * eps_y= ', X[0])
+    print('alhpa_y * eps_y= ', X[1])
+    print('gamma_y * eps_y= ', X[2])
+    return X_hor, res_hor, X_vert, res_vert
 
 # ---------
 
