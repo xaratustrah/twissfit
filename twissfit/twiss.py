@@ -61,8 +61,8 @@ def get_xfer_hor(ff, mq_hor):
 
 
 def get_xfer_vert(ff, mq_vert):
-    # (x|x), (x|a)
-    # (a|x), (a|a)
+    # (y|y), (y|b)
+    # (b|y), (b|b)
     return get_drift() @ ff @ mq_vert @ np.flip(ff).T
 
 
@@ -89,6 +89,17 @@ def transform(beta0, alpha0, xfer):
     return beta1, alpha1, gamma1
 
 
+def get_epsilon(X):
+    return np.sqrt(X[0] * X[2] - X[1]**2)
+
+# todo:
+
+
+# def plot_result_matrix(result_matrix):
+#    plt.plot
+# ------
+
+
 def solve_equation_system(result_matrix):
     nrows, ncols = np.shape(result_matrix)
 
@@ -110,9 +121,9 @@ def solve_equation_system(result_matrix):
     a_hor = np.reshape(a_hor, (nrows, 3))
     X_hor, res_hor, _, _ = np.linalg.lstsq(a_hor, b_hor, rcond=None)
     print()
-    print('beta_x * eps_x', X_hor[0])
-    print('alhpa_x * eps_x', X_hor[1])
-    print('gamma_x * eps_x', X_hor[2])
+    print('beta_x ', X_hor[0] / get_epsilon(X_hor))
+    print('alhpa_x ', X_hor[1] / get_epsilon(X_hor))
+    print('gamma_x ', X_hor[2] / get_epsilon(X_hor))
 
     # solving a X = b for y-plane
     for row in result_matrix:
@@ -128,9 +139,9 @@ def solve_equation_system(result_matrix):
     a_vert = np.reshape(a_vert, (nrows, 3))
     X_vert, res_vert, _, _ = np.linalg.lstsq(a_vert, b_vert, rcond=None)
     print()
-    print('beta_y * eps_y= ', X_vert[0])
-    print('alhpa_y * eps_y= ', X_vert[1])
-    print('gamma_y * eps_y= ', X_vert[2])
+    print('beta_y = ', X_vert[0] / get_epsilon(X_vert))
+    print('alhpa_y = ', X_vert[1] / get_epsilon(X_vert))
+    print('gamma_y = ', X_vert[2] / get_epsilon(X_vert))
     return X_hor, res_hor, X_vert, res_vert
 
 # ---------

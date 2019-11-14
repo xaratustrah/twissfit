@@ -52,8 +52,8 @@ def main():
         for file in files:
             for i in reversed(range(ntries)):
                 try:
-                    k_prime_l_quad = float(
-                        input("Please enter the K'L for {}: ".format(file)))
+                    k_prime_l_quad = np.abs(float(
+                        input("Please enter the K'L for {}: ".format(file))))
                     # print(k_prime_l_quad)
                     grid_data = ProfileGridData(file)
                     sigma_x, sigma_y = grid_data.process_horiz_and_vert(
