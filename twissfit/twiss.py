@@ -110,9 +110,9 @@ def solve_equation_system(result_matrix):
     a_hor = np.reshape(a_hor, (nrows, 3))
     X_hor, res_hor, _, _ = np.linalg.lstsq(a_hor, b_hor, rcond=None)
     print()
-    print('beta_x * eps_x', X[0])
-    print('alhpa_x * eps_x', X[1])
-    print('gamma_x * eps_x', X[2])
+    print('beta_x * eps_x', X_hor[0])
+    print('alhpa_x * eps_x', X_hor[1])
+    print('gamma_x * eps_x', X_hor[2])
 
     # solving a X = b for y-plane
     for row in result_matrix:
@@ -128,9 +128,9 @@ def solve_equation_system(result_matrix):
     a_vert = np.reshape(a_vert, (nrows, 3))
     X_vert, res_vert, _, _ = np.linalg.lstsq(a_vert, b_vert, rcond=None)
     print()
-    print('beta_y * eps_y= ', X[0])
-    print('alhpa_y * eps_y= ', X[1])
-    print('gamma_y * eps_y= ', X[2])
+    print('beta_y * eps_y= ', X_vert[0])
+    print('alhpa_y * eps_y= ', X_vert[1])
+    print('gamma_y * eps_y= ', X_vert[2])
     return X_hor, res_hor, X_vert, res_vert
 
 # ---------
