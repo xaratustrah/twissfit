@@ -124,11 +124,10 @@ def plot_sigma_vs_k_prime_l(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha
     ax = fig.gca()
     ax.plot(kl_iter, sigma_x_array, label='sigma_x')
     ax.plot(kl_iter, sigma_y_array, label='sigma_y')
-    # ax.plot(result_matrix[0], result_matrix[1],
-    #         'rs', label='sigma_x data')
-    # ax.plot(result_matrix[0], result_matrix[2],
-    #         'bs', label='sigma_y data')
-    print(result_matrix)
+    ax.plot(result_matrix[:, 0], result_matrix[:, 1],
+            'rs', label='sigma_x data')
+    ax.plot(result_matrix[:, 0], result_matrix[:, 2],
+            'bs', label='sigma_y data')
     ax.set_xlabel("K'L")
     ax.set_ylabel("sigma [mm]")
     ax.set_title("Sigma vs. K'L @ {} m from ref. plane".format(L_DRIFT))

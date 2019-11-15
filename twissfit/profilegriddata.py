@@ -5,7 +5,7 @@ Exporter, Fitter, plotter
 
 2019
 
-Xaratustrah
+Xaratustrah (S. Sanjari)
 
 """
 import os
