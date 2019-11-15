@@ -98,6 +98,50 @@ def get_epsilon(X):
     return np.sqrt(X[0] * X[2] - X[1]**2)
 
 
+def plot_sigma_vs_k_prime_l(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha_y, eps_y):
+    k_prime_l_quad_max = result_matrix.max(axis=0)[0] * (1 + 0.1)
+    kl_iter = np.linspace(0.01, k_prime_l_quad_max, 200)
+    sigma_x_array = np.array([])
+    sigma_y_array = np.array([])
+
+    for kl in kl_iter:
+        kappa_quad = get_kappa_quad(kl)
+        ff = get_ff(kl)
+        # x-plane
+        xfer_hor = get_xfer_hor(ff, get_mq_hor(kappa_quad), L_DRIFT)
+        beta_x_at_l, alpha_x_at_l, _ = transform(beta_x, alpha_x, xfer_hor)
+        sigma_x_array = np.append(sigma_x_array, get_sigma(beta_x_at_l, eps_x))
+
+    for kl in kl_iter:
+        kappa_quad = get_kappa_quad(kl)
+        ff = get_ff(kl)
+        # y-plane
+        xfer_vert = get_xfer_vert(ff, get_mq_vert(kappa_quad), L_DRIFT)
+        beta_y_at_l, alpha_y_at_l, _ = transform(beta_y, alpha_y, xfer_vert)
+        sigma_y_array = np.append(sigma_y_array, get_sigma(beta_y_at_l, eps_y))
+
+    fig = plt.figure()
+    ax = fig.gca()
+    ax.plot(kl_iter, sigma_x_array, label='sigma_x')
+    ax.plot(kl_iter, sigma_y_array, label='sigma_y')
+    # ax.plot(result_matrix[0], result_matrix[1],
+    #         'rs', label='sigma_x data')
+    # ax.plot(result_matrix[0], result_matrix[2],
+    #         'bs', label='sigma_y data')
+    ax.set_xlabel("K'L")
+    ax.set_ylabel("sigma [mm]")
+    ax.set_title("Sigma vs. K'L @ {} m from ref. plane".format(L_DRIFT))
+    # Now add the legend with some customizations.
+    legend = ax.legend(loc='upper right', shadow=False)
+
+    # Set legend fontsize
+    for label in legend.get_texts():
+        label.set_fontsize('small')
+
+    ax.grid(True)
+    plt.savefig('sigma_K_L_at_{}.pdf'.format(L_DRIFT))
+
+
 def plot_sigma_vs_distance(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha_y, eps_y):
     # choose the first of the K'L that the user had input
     kl = result_matrix[0, 0]
@@ -123,7 +167,7 @@ def plot_sigma_vs_distance(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha_
 
     fig = plt.figure()
     ax = fig.gca()
-    ax.plot(l_iter, sigma_x_array, label='sigma_y')
+    ax.plot(l_iter, sigma_x_array, label='sigma_x')
     ax.plot(l_iter, sigma_y_array, label='sigma_y')
     ax.set_xlabel("Distance [m]")
     ax.set_ylabel("sigma [mm]")
@@ -136,14 +180,7 @@ def plot_sigma_vs_distance(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha_
         label.set_fontsize('small')
 
     ax.grid(True)
-    plt.savefig('K_L_{}.pdf'.format(kl))
-
-    # y plane
-    # xfer_vert = get_xfer_vert(ff, get_mq_vert(kappa_quad))
-    # beta = 115.597
-    # alpha = -26.909
-    # print('vertical beta1, alpha1, gamma1', transform(beta, alpha, xfer_vert))
-
+    plt.savefig('sigma_distance_at_K_L_{}.pdf'.format(kl))
 
 # ------
 

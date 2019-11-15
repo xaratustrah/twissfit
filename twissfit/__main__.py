@@ -77,6 +77,8 @@ def main():
             result_matrix)
         plot_sigma_vs_distance(result_matrix, beta_x,
                                alpha_x, eps_x, beta_y, alpha_y, eps_y)
+        plot_sigma_vs_k_prime_l(result_matrix, beta_x,
+                                alpha_x, eps_x, beta_y, alpha_y, eps_y)
         sys.exit()
 
     print('\nNothing to do.')
