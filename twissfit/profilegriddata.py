@@ -94,7 +94,7 @@ class ProfileGridData(object):
         popt, pcov = curve_fit(ProfileGridData.fit_function,
                                x[data_cut], y[data_cut], p0=p)
         mean = popt[3]
-        sigma = np.abs(popt[4])
+        sigma = np.abs(popt[4])  # make sure sigma is positive
 
         area = sum(ProfileGridData.fit_function(x, *popt))
         # plot with original data

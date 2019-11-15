@@ -52,6 +52,7 @@ def main():
         for file in files:
             for i in reversed(range(ntries)):
                 try:
+                    # make sure the user input values are all positive
                     k_prime_l_quad = np.abs(float(
                         input("Please enter the K'L for {}: ".format(file))))
                     # print(k_prime_l_quad)
@@ -72,7 +73,10 @@ def main():
                     continue
                 break
         result_matrix = result_matrix.reshape((nfiles, 3))
-        solve_equation_system(result_matrix)
+        beta_x, alpha_x, eps_x, beta_y, alpha_y, eps_y = solve_equation_system(
+            result_matrix)
+        plot_sigma_vs_distance(result_matrix, beta_x,
+                               alpha_x, eps_x, beta_y, alpha_y, eps_y)
         sys.exit()
 
     print('\nNothing to do.')
