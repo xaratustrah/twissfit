@@ -28,11 +28,11 @@ B = -0.23044572  # T
 
 
 def get_gamma(beta, alpha):
-    return (1 + alpha**2) / beta
+    return np.abs((1 + alpha**2) / beta)
 
 
 def get_sigma(beta, eps):
-    return np.sqrt(beta * eps)
+    return np.abs(np.sqrt(beta * eps))
 
 
 def calculate_k_prime_l_quad():

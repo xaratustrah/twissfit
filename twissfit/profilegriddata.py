@@ -129,12 +129,16 @@ class ProfileGridData(object):
             print()
             print('Name | Offset | Slope | Amplitude | Mean | Sigma')
             print(self.filename_base, ' | '.join(map(str, popt)), area)
-        sigma_x = popt[4]
+
+        # make sure sigma is positive
+        sigma_x = np.abs(popt[4])
         popt, area = ProfileGridData.fit_and_plot(
             pos, ver_grid, name='{}_Vertical'.format(self.filename_base))
         if verbose:
             print()
             print('Name | Offset | Slope | Amplitude | Mean | Sigma')
             print(self.filename_base, ' | '.join(map(str, popt)), area)
-        sigma_y = popt[4]
+
+        # make sure sigma is positive
+        sigma_y = np.abs(popt[4])
         return sigma_x, sigma_y
