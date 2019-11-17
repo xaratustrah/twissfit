@@ -26,7 +26,7 @@ The files that are installed to your computer will be listed in the installed_fi
 
     xargs ls -la < installed_files.txt
 
-or delete them (be careful!) usin:
+or delete them (be careful!) using:
 
     xargs rm -rf < installed_files.txt
 
@@ -43,4 +43,5 @@ Finally in order to process them you may:
 
 ## Gallery
 
+<img src="https://raw.githubusercontent.com/xaratustrah/twissfit/master/beamline.jpg" width="">
 <img src="https://raw.githubusercontent.com/xaratustrah/twissfit/master/screenshot.png" width="">
