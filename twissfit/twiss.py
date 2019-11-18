@@ -215,6 +215,7 @@ def solve_equation_system(result_matrix):
     gamma_x = X_hor[2] / get_epsilon(X_hor)
     eps_x = get_epsilon(X_hor)
 
+    print('Results:')
     print()
     print('beta_x = ', beta_x)
     print('alpha_x = ', alpha_x)

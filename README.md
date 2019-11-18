@@ -46,6 +46,17 @@ Finally in order to process them you may:
 
 The resulting PDFs are stored in one single file, using the name of the first file in the series.
 
+You can provide the `-c` switch to tell the script that the file names already contain the K'L values so the script will not ask you anymore.
+
+    python3 -m twissfit -c -p *.csv
+
+This works only if the first 4 characters of the file name contain the value, like:
+
+    0.60_71d6e49e-0794-11ea-a666-4a0003a87d10.csv
+
+which means the value of K'L for this file is 0.6.
+
+
 ## Gallery
 
 <img src="https://raw.githubusercontent.com/xaratustrah/twissfit/master/beamline.jpg" width="">
