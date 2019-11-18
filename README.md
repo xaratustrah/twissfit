@@ -14,6 +14,10 @@ Using 3 or more values set for quadupole strength manually, the width of the bea
 
 ## Installation
 
+Installation requires the following libraries to run: **numpy**, **scipy**, **matplotlib** and **pypdf2**, which can be installed by using `pip`:
+
+    pip install numpy scipy matplotlib pypdf2
+
 To run locally without installation:
 
     python3 -m twissfit
@@ -40,6 +44,7 @@ Finally in order to process them you may:
 
     python3 -m twissfit -p *.csv
 
+The resulting PDFs are stored in one single file, using the name of the first file in the series.
 
 ## Gallery
 

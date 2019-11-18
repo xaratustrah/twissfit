@@ -70,7 +70,7 @@ class ProfileGridData(object):
         return p[0] + p[1] * x + p[2] * np.exp(-(x - p[3]) ** 2 / (2. * p[4] ** 2))
 
     @staticmethod
-    def fit_and_plot(x_data, y_data, name=""):
+    def fit_and_plot(x_data, y_data, title='', filename=''):
 
         # x and y are the variables for the fitter
         x = x_data
@@ -105,7 +105,7 @@ class ProfileGridData(object):
             x_for_plotting[x_for_plotting_data_cut], *popt), 'r', label='Fit')
         ax.set_xlabel('mean = {:0.2e}, sigma = {:0.2e}, area = {:0.2e}'.format(
             mean, sigma, area))
-        ax.set_title(name)
+        ax.set_title(title)
 
         # Now add the legend with some customizations.
         legend = ax.legend(loc='upper right', shadow=False)
@@ -115,7 +115,8 @@ class ProfileGridData(object):
             label.set_fontsize('small')
 
         plt.grid()
-        plt.savefig('{}.pdf'.format(name))
+        if filename:
+            plt.savefig(filename)
         return popt, area
 
     def process_horiz_and_vert(self, verbose=False):
@@ -123,8 +124,9 @@ class ProfileGridData(object):
         pos = self.data[:, 0]
         hor_grid = self.data[:, 1]
         ver_grid = self.data[:, 2]
+        plot_filename_hor = '{}_Horizontal.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
-            pos, hor_grid, name='{}_Horizontal'.format(self.filename_base))
+            pos, hor_grid, title='{}_Horizontal'.format(self.filename_base), filename=plot_filename_hor)
         if verbose:
             print()
             print('Name | Offset | Slope | Amplitude | Mean | Sigma')
@@ -132,8 +134,9 @@ class ProfileGridData(object):
 
         # make sure sigma is positive
         sigma_x = np.abs(popt[4])
+        plot_filename_vert = '{}_Vertical.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
-            pos, ver_grid, name='{}_Vertical'.format(self.filename_base))
+            pos, ver_grid, title='{}_Vertical'.format(self.filename_base), filename=plot_filename_vert)
         if verbose:
             print()
             print('Name | Offset | Slope | Amplitude | Mean | Sigma')
@@ -141,4 +144,4 @@ class ProfileGridData(object):
 
         # make sure sigma is positive
         sigma_y = np.abs(popt[4])
-        return sigma_x, sigma_y
+        return sigma_x, sigma_y, plot_filename_hor, plot_filename_vert

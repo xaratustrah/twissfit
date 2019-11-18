@@ -139,7 +139,9 @@ def plot_sigma_vs_k_prime_l(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha
         label.set_fontsize('small')
 
     ax.grid(True)
-    plt.savefig('sigma_K_L_at_{}.pdf'.format(L_DRIFT))
+    plot_filename = 'sigma_K_L_at_{}.pdf'.format(L_DRIFT)
+    plt.savefig(plot_filename)
+    return plot_filename
 
 
 def plot_sigma_vs_distance(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha_y, eps_y):
@@ -180,7 +182,9 @@ def plot_sigma_vs_distance(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha_
         label.set_fontsize('small')
 
     ax.grid(True)
-    plt.savefig('sigma_distance_at_K_L_{}.pdf'.format(kl))
+    plot_filename = 'sigma_distance_at_K_L_{}.pdf'.format(kl)
+    plt.savefig(plot_filename)
+    return plot_filename
 
 # ------
 
