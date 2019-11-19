@@ -13,6 +13,7 @@ import uuid
 import numpy as np
 from scipy.optimize import curve_fit
 import sys
+import logging as log
 from io import BytesIO
 import matplotlib.pyplot as plt
 
@@ -127,20 +128,18 @@ class ProfileGridData(object):
         plot_filename_hor = '{}_Horizontal.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
             pos, hor_grid, title='{}_Horizontal'.format(self.filename_base), filename=plot_filename_hor)
-        if verbose:
-            print()
-            print('Name | Offset | Slope | Amplitude | Mean | Sigma')
-            print(self.filename_base, ' | '.join(map(str, popt)), area)
+        log.info('File Name | Offset | Slope | Amplitude | Mean | Sigma')
+        log.info('{} | {} | {}'.format(self.filename_base,
+                                       ' | '.join(map(str, popt)), area))
 
         # make sure sigma is positive
         sigma_x = np.abs(popt[4])
         plot_filename_vert = '{}_Vertical.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
             pos, ver_grid, title='{}_Vertical'.format(self.filename_base), filename=plot_filename_vert)
-        if verbose:
-            print()
-            print('Name | Offset | Slope | Amplitude | Mean | Sigma')
-            print(self.filename_base, ' | '.join(map(str, popt)), area)
+        log.info('File Name | Offset | Slope | Amplitude | Mean | Sigma')
+        log.info('{} | {} | {}'.format(self.filename_base,
+                                       ' | '.join(map(str, popt)), area))
 
         # make sure sigma is positive
         sigma_y = np.abs(popt[4])

@@ -17,6 +17,7 @@ In the above reference, B, A and C are beta, alpha and gamma Twiss / Courant-Sny
 """
 
 import numpy as np
+import logging as log
 import matplotlib.pyplot as plt
 
 L_DRIFT = 2.216  # m
@@ -215,12 +216,11 @@ def solve_equation_system(result_matrix):
     gamma_x = X_hor[2] / get_epsilon(X_hor)
     eps_x = get_epsilon(X_hor)
 
-    print('Results:')
-    print()
-    print('beta_x = ', beta_x)
-    print('alpha_x = ', alpha_x)
-    print('gamma_x = ', gamma_x)
-    print('eps_x = ', eps_x)
+    log.info('Results:')
+    log.info('beta_x = {}'.format(beta_x))
+    log.info('alpha_x = {}'.format(alpha_x))
+    log.info('gamma_x = {}'.format(gamma_x))
+    log.info('eps_x = {}'.format(eps_x))
 
     # solving a X = b for y-plane
     for row in result_matrix:
@@ -241,11 +241,10 @@ def solve_equation_system(result_matrix):
     gamma_y = X_vert[2] / get_epsilon(X_vert)
     eps_y = get_epsilon(X_vert)
 
-    print()
-    print('beta_y = ', beta_y)
-    print('alpha_y = ', alpha_y)
-    print('gamma_y = ', gamma_y)
-    print('eps_y = ', eps_y)
+    log.info('beta_y = {}'.format(beta_y))
+    log.info('alpha_y = {}'.format(alpha_y))
+    log.info('gamma_y = {}'.format(gamma_y))
+    log.info('eps_y = {}'.format(eps_y))
     return beta_x, alpha_x, eps_x, beta_y, alpha_y, eps_y
 
 # ---------
@@ -264,9 +263,11 @@ if __name__ == '__main__':
     xfer_hor = get_xfer_hor(ff, get_mq_hor(kappa_quad), L_DRIFT)
     beta = 12.49
     alpha = 7.075
-    print('horizontal beta1, alpha1, gamma1', transform(beta, alpha, xfer_hor))
+    log.info('horizontal beta1, alpha1, gamma1',
+             transform(beta, alpha, xfer_hor))
     # y plane
     xfer_vert = get_xfer_vert(ff, get_mq_vert(kappa_quad), L_DRIFT)
     beta = 115.597
     alpha = -26.909
-    print('vertical beta1, alpha1, gamma1', transform(beta, alpha, xfer_vert))
+    log.info('vertical beta1, alpha1, gamma1',
+             transform(beta, alpha, xfer_vert))

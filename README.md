@@ -36,7 +36,7 @@ or delete them (be careful!) using:
 
 ## Usage
 
-To create 3 simulated data sets you can use:
+In general the `-v` or the `--verbose` switch increases the verbosity in all operations. To create 3 simulated data sets you can use:
 
     python3 -m twissfit -s 3
 

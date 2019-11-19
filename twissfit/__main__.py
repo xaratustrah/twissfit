@@ -12,6 +12,7 @@ Xaratustrah (S. Sanjari)
 import os
 import sys
 import argparse
+import logging as log
 import numpy as np
 from PyPDF2 import PdfFileMerger
 from twissfit.twiss import *
@@ -23,8 +24,10 @@ def main():
     scriptname = 'twissfit'
     contains = False
     parser = argparse.ArgumentParser()
-    parser.add_argument('-v', '--version',
+    parser.add_argument('--version',
                         help='Print version', action='store_true')
+    parser.add_argument(
+        '-v', '--verbose', help='Increase output verbosity', action='store_true')
     parser.add_argument('-s', '--sim', nargs=1, type=int,
                         help='Number of simulated data files to produce.')
     parser.add_argument('-p', '--process', nargs='*', type=str,
@@ -33,6 +36,10 @@ def main():
                         help="File name contains the K'L value.")
 
     args = parser.parse_args()
+    if args.verbose:
+        log.basicConfig(level=log.INFO)
+        pass
+
     if args.version:
         print('{} {}'.format(scriptname, __version__))
         sys.exit()
@@ -42,7 +49,7 @@ def main():
 
     if args.sim:
         nsim = int(args.sim[0])
-        print('Creating {} simulated data files.'.format(nsim))
+        log.info('Creating {} simulated data files.'.format(nsim))
         for i in range(nsim):
             ProfileGridData.write_sim_data()
         sys.exit()
@@ -54,7 +61,8 @@ def main():
         ntries = 4
         plot_filenames = []
         if nfiles < nfiles_min:
-            print('Please provide at least {} files.'.format(nfiles_min))
+            log.error(
+                'Please provide at least {} files.'.format(nfiles_min))
             sys.exit()
         result_matrix = np.array([], dtype=np.float64)
 
@@ -62,13 +70,12 @@ def main():
             for file in files:
                 try:
                     k_prime_l_quad = float(file[:4])
-                except ValueError as e:
-                    print(
-                        '\nWhen using the -c switch, the first 4 digits of the file name must contain a valid float. Aborting.')
+                except:
+                    log.error(
+                        'When using the -c switch, the first 4 digits of the file name must contain a valid float. Aborting.')
                     sys.exit()
                 grid_data = ProfileGridData(file)
-                sigma_x, sigma_y, plot_filename_hor, plot_filename_vert = grid_data.process_horiz_and_vert(
-                    verbose=False)
+                sigma_x, sigma_y, plot_filename_hor, plot_filename_vert = grid_data.process_horiz_and_vert()
                 result_matrix = np.append(
                     result_matrix, (k_prime_l_quad, sigma_x, sigma_y))
                 plot_filenames.extend(
@@ -93,15 +100,16 @@ def main():
                             [plot_filename_hor, plot_filename_vert])
 
                     except (KeyboardInterrupt, EOFError) as e:
-                        print('\nNothing to do.')
+                        log.error('\nNothing to do.')
                         sys.exit()
 
                     except ValueError as e:
                         if i == 0:
-                            print('Too many wrong entries.\nNothing to do.\n')
+                            log.error(
+                                'Too many wrong entries. Nothing to do.')
                             sys.exit()
-                        print(
-                            '\nNot a valid number. Please try again. You have {} tries left.'.format(i))
+                        log.error(
+                            'Not a valid number. Please try again. You have {} tries left.'.format(i))
                         continue
 
                     break
@@ -125,7 +133,7 @@ def main():
         merger.close()
         sys.exit()
 
-    print('\nNothing to do.')
+    log.error('Nothing to do.')
 
 
 if __name__ == "__main__":
