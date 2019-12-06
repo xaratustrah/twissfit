@@ -18,7 +18,7 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 
 RANGE = 10
-SIGMA_ESTIMATE = 10
+SIGMA_ESTIMATE = 5
 
 
 class ProfileGridData(object):
@@ -35,9 +35,16 @@ class ProfileGridData(object):
         # yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=67)
 
         # 77 point variant
+        # xvals = np.genfromtxt(self.filename, delimiter=',',
+        #                       skip_header=5, skip_footer=78)
+        # yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=83)
+
+        # 96 point varaint
         xvals = np.genfromtxt(self.filename, delimiter=',',
-                              skip_header=5, skip_footer=78)
-        yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=83)
+                              skip_header=5, skip_footer=1)
+        print(len(xvals))
+        yvals = np.zeros((95, 2))
+
         self.data = np.concatenate((xvals, yvals), axis=1)
         self.data = np.delete(self.data, 2, 1)
         log.info('Data point length: {}'.format(np.shape(self.data)[0]))
