@@ -140,6 +140,7 @@ class ProfileGridData(object):
                                        ' | '.join(map(str, popt)), area))
 
         # make sure sigma is positive
+        mean_x = popt[3]
         sigma_x = np.abs(popt[4])
         plot_filename_vert = '{}_Vertical.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
@@ -149,5 +150,6 @@ class ProfileGridData(object):
                                        ' | '.join(map(str, popt)), area))
 
         # make sure sigma is positive
+        mean_y = popt[3]
         sigma_y = np.abs(popt[4])
-        return sigma_x, sigma_y, plot_filename_hor, plot_filename_vert
+        return mean_x, mean_y, sigma_x, sigma_y, plot_filename_hor, plot_filename_vert

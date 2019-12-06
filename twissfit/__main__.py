@@ -30,6 +30,8 @@ def main():
         '-v', '--verbose', help='Increase output verbosity', action='store_true')
     parser.add_argument('-s', '--sim', nargs=1, type=int,
                         help='Number of simulated data files to produce.')
+    parser.add_argument('-d', '--draw', nargs='*', type=str,
+                        help='Draw the fit only. No processing.')
     parser.add_argument('-p', '--process', nargs='*', type=str,
                         help='Process files.')
     parser.add_argument('-c', '--contains', action="store_true", default=False,
@@ -54,6 +56,13 @@ def main():
             ProfileGridData.write_sim_data()
         sys.exit()
 
+    if args.draw:
+        files = args.draw
+        for file in files:
+            grid_data = ProfileGridData(file)
+            grid_data.process_horiz_and_vert()
+        sys.exit()
+
     if args.process:
         files = args.process
         nfiles = len(files)
@@ -75,7 +84,7 @@ def main():
                         'When using the -c switch, the first 4 digits of the file name must contain a valid float. Aborting.')
                     sys.exit()
                 grid_data = ProfileGridData(file)
-                sigma_x, sigma_y, plot_filename_hor, plot_filename_vert = grid_data.process_horiz_and_vert()
+                mean_x, mean_y, sigma_x, sigma_y, plot_filename_hor, plot_filename_vert = grid_data.process_horiz_and_vert()
                 result_matrix = np.append(
                     result_matrix, (k_prime_l_quad, sigma_x, sigma_y))
                 plot_filenames.extend(
