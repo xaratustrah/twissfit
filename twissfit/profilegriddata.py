@@ -17,7 +17,7 @@ import logging as log
 from io import BytesIO
 import matplotlib.pyplot as plt
 
-RANGE = 25
+RANGE = 10
 SIGMA_ESTIMATE = 10
 
 
@@ -29,11 +29,18 @@ class ProfileGridData(object):
         self.data = np.array([])
 
     def _read_data(self):
+        # 47 point variant
+        # xvals = np.genfromtxt(self.filename, delimiter=',',
+        #                       skip_header=5, skip_footer=62)
+        # yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=67)
+
+        # 77 point variant
         xvals = np.genfromtxt(self.filename, delimiter=',',
-                              skip_header=5, skip_footer=62)
-        yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=67)
+                              skip_header=5, skip_footer=78)
+        yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=83)
         self.data = np.concatenate((xvals, yvals), axis=1)
         self.data = np.delete(self.data, 2, 1)
+        log.info('Data point length: {}'.format(np.shape(self.data)[0]))
 
     @staticmethod
     def create_sim_data():
