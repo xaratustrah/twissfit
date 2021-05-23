@@ -88,7 +88,7 @@ for example, like:
         'variant' : 47,
     }
 
-which means, that 4 channels are ignored in the data from the horizontal detector, and no channels from the vertical detector. Some corresponding values are set instead of offset, slope, etc... and the last point demonstrate that we have a 47 point variant of data from the profile grid detector.
+which means, that 4 channels are ignored in the data from the horizontal detector, and no channels from the vertical detector. Some corresponding values are set instead of offset, slope, etc... and the last point demonstrate that we have a 47 point variant of data from the profile grid detector. Default values are `[None, None, None, None, None, None]`, which means the script tries to estimate by itself. In any case you can provide mixed values and/or `None` also in the JSON init file.
 
 In the above examples, the usage of the JSON initialiser would look like the following:
 

@@ -69,10 +69,12 @@ def main():
             sys.exit()
     else:
         # put some default values here
+        # [offset, slope, amp, mean, sigma, cut_range]
+        # putting "None" signals the script to take default values
         init_dict = {"x_omit": [],
                      "y_omit": [],
-                     "x_fit_params": [1, 1, 1, 1, 1, 1],
-                     "y_fit_params": [1, 1, 1, 1, 1, 1],
+                     "x_fit_params": [None, None, None, None, None, None],
+                     "y_fit_params": [None, None, None, None, None, None],
                      "variant": 47}
 
     # draw and process come at least, draw before process
@@ -146,6 +148,10 @@ def main():
         result_matrix = result_matrix.reshape((nfiles, 3))
         beta_x, alpha_x, eps_x, beta_y, alpha_y, eps_y = solve_equation_system(
             result_matrix)
+
+        log.info('beta_x, alpha_x, eps_x', beta_x, alpha_x, eps_x)
+        log.info('beta_y, alpha_y, eps_y', beta_y, alpha_y, eps_y)
+
         plt_file_1 = plot_sigma_vs_distance(result_matrix, beta_x,
                                             alpha_x, eps_x, beta_y, alpha_y, eps_y)
         plt_file_2 = plot_sigma_vs_k_prime_l(result_matrix, beta_x,

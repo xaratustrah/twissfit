@@ -47,7 +47,19 @@ class ProfileGridData(object):
 
         self.data = np.concatenate((xvals, yvals), axis=1)
         self.data = np.delete(self.data, 2, 1)
-        log.info('Data point length: {}'.format(np.shape(self.data)[0]))
+        log.info('Data point length before omit: {}'.format(
+            np.shape(self.data)[0]))
+
+        # omit the malfunctioning rows from the matrix
+        rowcnt = 0
+        rowdellist = []
+        for row in self.data:
+            if row[0] in self.init_dict['x_omit']:
+                rowdellist.append(rowcnt)
+            rowcnt += 1
+        self.data = np.delete(self.data, rowdellist, axis=0)
+        log.info('Data point length after omit: {}'.format(
+            np.shape(self.data)[0]))
 
     @staticmethod
     def create_sim_data():
@@ -92,21 +104,40 @@ class ProfileGridData(object):
         x_for_plotting = np.linspace(x_data.min(), x_data.max(), 400)
         y = y_data
 
-        # Estimate for mean and sigma
-        # mean_idx = y.argmax()
-        # mean = x[mean_idx]
-        # sigma = SIGMA_ESTIMATE
-        # offset = y[mean_idx - 5]
-        # slope = 1
-        # amp = 1
+        # take values from init JSON or estimate default values
+        # params are like: [offset, slope, amp, mean, sigma, cut_range]
 
-        # take values from init JSON
-        offset = fit_params[0]
-        slope = fit_params[1]
-        amp = fit_params[2]
-        mean = fit_params[3]
-        sigma = fit_params[4]
-        cut_range = fit_params[5]
+        mean_idx = y.argmax()
+
+        if not fit_params[0]:
+            offset = y[mean_idx - 5]
+        else:
+            offset = fit_params[0]
+
+        if not fit_params[1]:
+            slope = 1
+        else:
+            slope = fit_params[1]
+
+        if not fit_params[2]:
+            amp = 1000
+        else:
+            amp = fit_params[2]
+
+        if not fit_params[3]:
+            mean = x[mean_idx]
+        else:
+            mean = fit_params[3]
+
+        if not fit_params[4]:
+            sigma = 20
+        else:
+            sigma = fit_params[4]
+
+        if not fit_params[5]:
+            cut_range = 2 * sigma
+        else:
+            cut_range = fit_params[5]
 
         p = [offset, slope, amp, mean, sigma]
         # defining the fitting region
