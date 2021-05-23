@@ -123,8 +123,8 @@ def plot_sigma_vs_k_prime_l(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha
 
     fig = plt.figure()
     ax = fig.gca()
-    ax.plot(kl_iter, sigma_x_array, label='sigma_x')
-    ax.plot(kl_iter, sigma_y_array, label='sigma_y')
+    ax.plot(kl_iter, sigma_x_array, 'r', label='sigma_x')
+    ax.plot(kl_iter, sigma_y_array, 'b', label='sigma_y')
     ax.plot(result_matrix[:, 0], result_matrix[:, 1],
             'rs', label='sigma_x data')
     ax.plot(result_matrix[:, 0], result_matrix[:, 2],
@@ -170,8 +170,8 @@ def plot_sigma_vs_distance(result_matrix, beta_x, alpha_x, eps_x, beta_y, alpha_
 
     fig = plt.figure()
     ax = fig.gca()
-    ax.plot(l_iter, sigma_x_array, label='sigma_x')
-    ax.plot(l_iter, sigma_y_array, label='sigma_y')
+    ax.plot(l_iter, sigma_x_array, 'r', label='sigma_x')
+    ax.plot(l_iter, sigma_y_array, 'b', label='sigma_y')
     ax.set_xlabel("Distance [m]")
     ax.set_ylabel("sigma [mm]")
     ax.set_title("Sigma vs. Distance for K'L = {}".format(kl))
