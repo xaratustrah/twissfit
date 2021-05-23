@@ -12,6 +12,7 @@ Xaratustrah (S. Sanjari)
 import os
 import sys
 import argparse
+import json
 import logging as log
 import numpy as np
 from PyPDF2 import PdfFileMerger
@@ -36,8 +37,11 @@ def main():
                         help='Process files.')
     parser.add_argument('-c', '--contains', action="store_true", default=False,
                         help="File name contains the K'L value.")
+    parser.add_argument('-i', '--init', nargs='?', type=str, default=None,
+                        help="Name of the initialiser JSON file.")
 
     args = parser.parse_args()
+
     if args.verbose:
         log.basicConfig(level=log.INFO)
         pass
@@ -56,10 +60,26 @@ def main():
             ProfileGridData.write_sim_data()
         sys.exit()
 
+    if args.init:
+        try:
+            with open(str(args.init), 'r') as f:
+                init_dict = json.load(f)
+        except:
+            print('Something wrong with the init file. Aborting.')
+            sys.exit()
+    else:
+        # put some default values here
+        init_dict = {"x_omit": [],
+                     "y_omit": [],
+                     "x_fit_params": [1, 1, 1, 1, 1, 1],
+                     "y_fit_params": [1, 1, 1, 1, 1, 1],
+                     "variant": 47}
+
+    # draw and process come at least, draw before process
     if args.draw:
         files = args.draw
         for file in files:
-            grid_data = ProfileGridData(file)
+            grid_data = ProfileGridData(file, init_dict)
             grid_data.process_horiz_and_vert()
         sys.exit()
 
@@ -83,7 +103,7 @@ def main():
                     log.error(
                         'When using the -c switch, the first 4 digits of the file name must contain a valid float. Aborting.')
                     sys.exit()
-                grid_data = ProfileGridData(file)
+                grid_data = ProfileGridData(file, init_dict)
                 mean_x, mean_y, sigma_x, sigma_y, plot_filename_hor, plot_filename_vert = grid_data.process_horiz_and_vert()
                 result_matrix = np.append(
                     result_matrix, (k_prime_l_quad, sigma_x, sigma_y))
@@ -100,7 +120,7 @@ def main():
                         # make sure the user input values are all positive
                         k_prime_l_quad = np.abs(float(
                             input("Please enter the K'L for {}: ".format(file))))
-                        grid_data = ProfileGridData(file)
+                        grid_data = ProfileGridData(file, init_dict)
                         sigma_x, sigma_y, plot_filename_hor, plot_filename_vert = grid_data.process_horiz_and_vert(
                             verbose=False)
                         result_matrix = np.append(

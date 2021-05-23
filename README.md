@@ -36,11 +36,19 @@ or delete them (be careful!) using:
 
 ## Usage
 
-In general the `-v` or the `--verbose` switch increases the verbosity in all operations. To create 3 simulated data sets you can use:
+In general the `-v` or the `--verbose` switch increases the verbosity in all operations.
+
+In order to test the code, you can create test datasets. To create 3 simulated data sets you can use:
 
     python3 -m twissfit -s 3
 
-Finally in order to process them you may:
+Whether you have simulated data or real data from the detector, you would like to either have a plot and check them, or you like to process them completely. If you just like to draw the fits and have a look at them, you can use the `-d` option, like:
+
+    python -m twissfit -d *.csv
+
+This creates the corresponding plots with the fits. You can use this option to get the initial feeling for your raw data before you further process them.
+
+Finally in order to process the files completely them you may:
 
     python3 -m twissfit -p *.csv
 
@@ -55,6 +63,41 @@ This works only if the first 4 characters of the file name contain the value, li
     0.60_71d6e49e-0794-11ea-a666-4a0003a87d10.csv
 
 which means the value of K'L for this file is 0.6.
+
+A configuration file can be provided with the `-p` flag to the command line. This config file should be in JSON format, i.e. a ASCII file, which you can for example call `init_params.json` with the following content:
+
+- x_omit: List of malfunctioning channels in horizontal detector
+- y_omit: List of malfunctioning channels in vertical detector
+- fit_params: list of starting values for the fit parameters
+- variant: determines what type of data the detectors deliver, 47 point variant, 77 point variant and 96 point variant
+
+    {
+        'x_omit': [...],    
+        'y_omit': [...],
+        'fit_params': [...],
+        'varaint' : ...,
+    }
+
+for example, like:
+
+    {
+        'x_omit': [-20, -19, -18, -17],    
+        'y_omit': [],
+        'x_fit_params': [offset, slope, amp, mean, sigma, cut_range],
+        'y_fit_params': [offset, slope, amp, mean, sigma, cut_range],
+        'variant' : 47,
+    }
+
+which means, that 4 channels are ignored in the data from the horizontal detector, and no channels from the vertical detector. Some corresponding values are set instead of offset, slope, etc... and the last point demonstrate that we have a 47 point variant of data from the profile grid detector.
+
+In the above examples, the usage of the JSON initialiser would look like the following:
+
+    python -m twissfit -i init_file.json -d *.csv
+
+or
+
+    python3 -m twissfit -c -i init_file.json -p *.csv
+
 
 
 ## Gallery

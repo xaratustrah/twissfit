@@ -17,33 +17,33 @@ import logging as log
 from io import BytesIO
 import matplotlib.pyplot as plt
 
-RANGE = 10
-SIGMA_ESTIMATE = 5
-
 
 class ProfileGridData(object):
-    def __init__(self, filename):
+    def __init__(self, filename, init_dict):
         self.filename = filename
         self.filename_base = os.path.basename(filename)
         self.filename_wo_ext = os.path.splitext(filename)[0]
         self.data = np.array([])
+        self.init_dict = init_dict
 
     def _read_data(self):
         # 47 point variant
-        # xvals = np.genfromtxt(self.filename, delimiter=',',
-        #                       skip_header=5, skip_footer=62)
-        # yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=67)
+        if self.init_dict['variant'] == 47:
+            xvals = np.genfromtxt(self.filename, delimiter=',',
+                                  skip_header=5, skip_footer=62)
+            yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=67)
 
         # 77 point variant
-        # xvals = np.genfromtxt(self.filename, delimiter=',',
-        #                       skip_header=5, skip_footer=78)
-        # yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=83)
+        if self.init_dict['variant'] == 77:
+            xvals = np.genfromtxt(self.filename, delimiter=',',
+                                  skip_header=5, skip_footer=78)
+            yvals = np.genfromtxt(self.filename, delimiter=',', skip_header=83)
 
         # 96 point varaint
-        xvals = np.genfromtxt(self.filename, delimiter=',',
-                              skip_header=5, skip_footer=1)
-        print(len(xvals))
-        yvals = np.zeros((95, 2))
+        if self.init_dict['variant'] == 96:
+            xvals = np.genfromtxt(self.filename, delimiter=',',
+                                  skip_header=5, skip_footer=1)
+            yvals = np.zeros((95, 2))
 
         self.data = np.concatenate((xvals, yvals), axis=1)
         self.data = np.delete(self.data, 2, 1)
@@ -85,7 +85,7 @@ class ProfileGridData(object):
         return p[0] + p[1] * x + p[2] * np.exp(-(x - p[3]) ** 2 / (2. * p[4] ** 2))
 
     @staticmethod
-    def fit_and_plot(x_data, y_data, title='', filename=''):
+    def fit_and_plot(x_data, y_data, fit_params, title='', filename=''):
 
         # x and y are the variables for the fitter
         x = x_data
@@ -93,17 +93,26 @@ class ProfileGridData(object):
         y = y_data
 
         # Estimate for mean and sigma
-        mean_idx = y.argmax()
-        mean = x[mean_idx]
-        sigma = SIGMA_ESTIMATE
-        offset = y[mean_idx - 5]
-        slope = 1
-        amp = 1
+        # mean_idx = y.argmax()
+        # mean = x[mean_idx]
+        # sigma = SIGMA_ESTIMATE
+        # offset = y[mean_idx - 5]
+        # slope = 1
+        # amp = 1
+
+        # take values from init JSON
+        offset = fit_params[0]
+        slope = fit_params[1]
+        amp = fit_params[2]
+        mean = fit_params[3]
+        sigma = fit_params[4]
+        cut_range = fit_params[5]
+
         p = [offset, slope, amp, mean, sigma]
         # defining the fitting region
-        data_cut = (x > mean - RANGE) & (x < mean + RANGE)
+        data_cut = (x > mean - cut_range) & (x < mean + cut_range)
         x_for_plotting_data_cut = (
-            x_for_plotting > mean - RANGE) & (x_for_plotting < mean + RANGE)
+            x_for_plotting > mean - cut_range) & (x_for_plotting < mean + cut_range)
 
         # fit
         popt, pcov = curve_fit(ProfileGridData.fit_function,
@@ -141,7 +150,7 @@ class ProfileGridData(object):
         ver_grid = self.data[:, 2]
         plot_filename_hor = '{}_Horizontal.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
-            pos, hor_grid, title='{}_Horizontal'.format(self.filename_base), filename=plot_filename_hor)
+            pos, hor_grid, self.init_dict['x_fit_params'], title='{}_Horizontal'.format(self.filename_base), filename=plot_filename_hor)
         log.info('File Name | Offset | Slope | Amplitude | Mean | Sigma')
         log.info('{} | {} | {}'.format(self.filename_base,
                                        ' | '.join(map(str, popt)), area))
@@ -151,7 +160,7 @@ class ProfileGridData(object):
         sigma_x = np.abs(popt[4])
         plot_filename_vert = '{}_Vertical.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
-            pos, ver_grid, title='{}_Vertical'.format(self.filename_base), filename=plot_filename_vert)
+            pos, ver_grid, self.init_dict['y_fit_params'], title='{}_Vertical'.format(self.filename_base), filename=plot_filename_vert)
         log.info('File Name | Offset | Slope | Amplitude | Mean | Sigma')
         log.info('{} | {} | {}'.format(self.filename_base,
                                        ' | '.join(map(str, popt)), area))
