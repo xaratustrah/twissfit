@@ -23,7 +23,8 @@ class ProfileGridData(object):
         self.filename = filename
         self.filename_base = os.path.basename(filename)
         self.filename_wo_ext = os.path.splitext(filename)[0]
-        self.data = np.array([])
+        self.x_data = np.array([])
+        self.y_data = np.array([])
         self.init_dict = init_dict
 
     def _read_data(self):
@@ -45,21 +46,34 @@ class ProfileGridData(object):
                                   skip_header=5, skip_footer=1)
             yvals = np.zeros((95, 2))
 
-        self.data = np.concatenate((xvals, yvals), axis=1)
-        self.data = np.delete(self.data, 2, 1)
+        self.x_data = xvals
+        self.y_data = yvals
+        self.xy_data = np.concatenate((xvals, yvals), axis=1)
+        self.xy_data = np.delete(self.xy_data, 2, 1)
         log.info('Data point length before omit: {}'.format(
-            np.shape(self.data)[0]))
+            np.shape(self.xy_data)[0]))
 
-        # omit the malfunctioning rows from the matrix
+        # omit the malfunctioning rows from the x_data
         rowcnt = 0
         rowdellist = []
-        for row in self.data:
+        for row in self.x_data:
             if row[0] in self.init_dict['x_omit']:
                 rowdellist.append(rowcnt)
             rowcnt += 1
-        self.data = np.delete(self.data, rowdellist, axis=0)
-        log.info('Data point length after omit: {}'.format(
-            np.shape(self.data)[0]))
+        self.x_data = np.delete(self.x_data, rowdellist, axis=0)
+        log.info('Data point length after x_omit: {}'.format(
+            np.shape(self.x_data)[0]))
+
+        # omit the malfunctioning rows from the x_data
+        rowcnt = 0
+        rowdellist = []
+        for row in self.y_data:
+            if row[0] in self.init_dict['y_omit']:
+                rowdellist.append(rowcnt)
+            rowcnt += 1
+        self.y_data = np.delete(self.y_data, rowdellist, axis=0)
+        log.info('Data point length after y_omit: {}'.format(
+            np.shape(self.y_data)[0]))
 
     @staticmethod
     def create_sim_data():
@@ -176,27 +190,28 @@ class ProfileGridData(object):
 
     def process_horiz_and_vert(self, verbose=False):
         self._read_data()
-        pos = self.data[:, 0]
-        hor_grid = self.data[:, 1]
-        ver_grid = self.data[:, 2]
+
+        # horizontal direction
+        x_pos = self.x_data[:, 0]
+        hor_grid = self.x_data[:, 1]
         plot_filename_hor = '{}_Horizontal.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
-            pos, hor_grid, self.init_dict['x_fit_params'], title='{}_Horizontal'.format(self.filename_base), filename=plot_filename_hor)
+            x_pos, hor_grid, self.init_dict['x_fit_params'], title='{}_Horizontal'.format(self.filename_base), filename=plot_filename_hor)
         log.info('File Name | Offset | Slope | Amplitude | Mean | Sigma')
         log.info('{} | {} | {}'.format(self.filename_base,
                                        ' | '.join(map(str, popt)), area))
-
-        # make sure sigma is positive
         mean_x = popt[3]
-        sigma_x = np.abs(popt[4])
+        sigma_x = np.abs(popt[4])  # make sure sigma is positive
+
+        # vertical direction
+        y_pos = self.y_data[:, 0]
+        ver_grid = self.y_data[:, 1]
         plot_filename_vert = '{}_Vertical.pdf'.format(self.filename_wo_ext)
         popt, area = ProfileGridData.fit_and_plot(
-            pos, ver_grid, self.init_dict['y_fit_params'], title='{}_Vertical'.format(self.filename_base), filename=plot_filename_vert)
+            y_pos, ver_grid, self.init_dict['y_fit_params'], title='{}_Vertical'.format(self.filename_base), filename=plot_filename_vert)
         log.info('File Name | Offset | Slope | Amplitude | Mean | Sigma')
         log.info('{} | {} | {}'.format(self.filename_base,
                                        ' | '.join(map(str, popt)), area))
-
-        # make sure sigma is positive
         mean_y = popt[3]
-        sigma_y = np.abs(popt[4])
+        sigma_y = np.abs(popt[4])  # make sure sigma is positive
         return mean_x, mean_y, sigma_x, sigma_y, plot_filename_hor, plot_filename_vert
